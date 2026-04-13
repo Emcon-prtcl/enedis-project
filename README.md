@@ -96,5 +96,8 @@ Les courbes générées sont cohérentes avec les profils observés.
 
 Un dashboard Streamlit a été développé pour visualiser les résultats :
 
+### IA
+rapport rédigé à la main puis généré par chatgpt pour que ce soit plus propre
+
 ### bash
 streamlit run app.py
