@@ -3,18 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# =========================
-# 1) Paths
-# =========================
+# Chemins vers les fichiers
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_PATH = BASE_DIR / "outputs" / "sample_data.csv"
 OUTPUT_DIR = BASE_DIR / "outputs"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 
-# =========================
-# 2) Load sample dataset
-# =========================
+# Chargement du dataset échantillon
 print("Loading sample dataset...")
 df = pd.read_csv(DATA_PATH)
 
@@ -25,9 +21,7 @@ print("\nDataset shape:")
 print(df.shape)
 
 
-# =========================
-# 3) Convert date columns again after CSV reload
-# =========================
+# Conversion des colonnes de date après rechargement du CSV
 df["horodate"] = pd.to_datetime(df["horodate"], utc=True, errors="coerce")
 df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
@@ -35,9 +29,7 @@ print("\nData types:")
 print(df.dtypes)
 
 
-# =========================
-# 4) Global time coverage
-# =========================
+# Vérification de la période couverte par les données
 print("\nTime coverage:")
 print("Start:", df["horodate"].min())
 print("End  :", df["horodate"].max())
@@ -46,16 +38,12 @@ n_days = df["date"].nunique()
 print("Number of distinct days:", n_days)
 
 
-# =========================
-# 5) Number of customers
-# =========================
+# Nombre de clients présents dans l'échantillon
 n_customers = df["id"].nunique()
 print("\nNumber of customers:", n_customers)
 
 
-# =========================
-# 6) Number of measurements per customer
-# =========================
+# Nombre total de mesures par client
 counts_per_customer = df.groupby("id").size().sort_values()
 
 print("\nMeasurements per customer:")
@@ -68,23 +56,19 @@ print("\nLargest counts:")
 print(counts_per_customer.tail())
 
 
-# =========================
-# 7) Number of measurements per customer per day
-# =========================
+# Nombre de mesures par client et par jour
 daily_counts = df.groupby(["id", "date"]).size()
 
 print("\nMeasurements per customer per day:")
 print(daily_counts.describe())
 
-# Ideally, with 30-minute resolution, one full day = 48 points
+# Avec une mesure toutes les 30 minutes, on attend 48 points par jour
 incomplete_days = daily_counts[daily_counts != 48]
 
 print(f"\nNumber of incomplete customer-days (not equal to 48 points): {len(incomplete_days)}")
 
 
-# =========================
-# 8) Daily energy per customer
-# =========================
+# Calcul de l'énergie journalière pour chaque client
 daily_energy = (
     df.groupby(["id", "date"])["energie_kwh"]
     .sum()
@@ -99,9 +83,7 @@ print("\nDaily energy stats:")
 print(daily_energy["daily_energy_kwh"].describe())
 
 
-# =========================
-# 9) Plot daily energy for one customer
-# =========================
+# Visualisation de la consommation journalière pour un client
 customer_id = df["id"].iloc[0]
 
 customer_daily = daily_energy[daily_energy["id"] == customer_id].copy()
@@ -121,9 +103,7 @@ plt.close()
 print(f"\nSaved plot: {plot1_path}")
 
 
-# =========================
-# 10) Average load curve over the day
-# =========================
+# Courbe moyenne sur une journée
 df["time_slot"] = df["hour"].astype(str).str.zfill(2) + ":" + df["minute"].astype(str).str.zfill(2)
 
 mean_curve = (
@@ -131,9 +111,6 @@ mean_curve = (
     .mean()
     .reset_index()
 )
-
-# Keep chronological order
-mean_curve["slot_order"] = range(len(mean_curve))
 
 plt.figure(figsize=(10, 4))
 plt.plot(mean_curve["time_slot"], mean_curve["energie_kwh"])
@@ -149,9 +126,7 @@ plt.close()
 print(f"Saved plot: {plot2_path}")
 
 
-# =========================
-# 11) Weekday vs weekend comparison
-# =========================
+# Comparaison entre semaine et week-end
 weekday_weekend = (
     df.groupby(["is_weekend", "time_slot"])["energie_kwh"]
     .mean()
@@ -177,9 +152,7 @@ plt.close()
 print(f"Saved plot: {plot3_path}")
 
 
-# =========================
-# 12) Save daily energy dataset
-# =========================
+# Sauvegarde du dataset d'énergie journalière
 daily_energy_path = OUTPUT_DIR / "daily_energy.csv"
 daily_energy.to_csv(daily_energy_path, index=False)
 print(f"\nSaved daily energy dataset: {daily_energy_path}")
