@@ -2,9 +2,8 @@ from pathlib import Path
 import streamlit as st
 import pandas as pd
 
-# =========================
 # Paths
-# =========================
+
 BASE_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = BASE_DIR / "outputs"
 
@@ -18,18 +17,17 @@ GENERATED_IMG = OUTPUT_DIR / "generated_curves.png"
 AVG_CURVE_IMG = OUTPUT_DIR / "average_daily_curve.png"
 WEEKDAY_WEEKEND_IMG = OUTPUT_DIR / "weekday_vs_weekend_curve.png"
 
-# =========================
 # Page config
-# =========================
+
 st.set_page_config(
     page_title="Enedis Consumption Dashboard",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# =========================
+
 # Small custom CSS
-# =========================
+
 st.markdown("""
 <style>
 .block-container {
@@ -48,26 +46,25 @@ h1, h2, h3 {
 </style>
 """, unsafe_allow_html=True)
 
-# =========================
+
 # Load data
-# =========================
+
 features_df = pd.read_csv(FEATURES_PATH)
 clustered_df = pd.read_csv(CLUSTERED_PATH)
 daily_energy_df = pd.read_csv(DAILY_ENERGY_PATH)
 daily_energy_df["date"] = pd.to_datetime(daily_energy_df["date"])
 
-# =========================
 # Sidebar
-# =========================
+
 st.sidebar.title("Navigation")
 section = st.sidebar.radio(
     "Choisir une section",
     ["Introduction", "Clustering", "Classification", "Forecasting", "Generation"]
 )
 
-# =========================
+
 # Header
-# =========================
+
 st.title("Enedis Consumption Analysis Dashboard")
 st.markdown(
     '<div class="small-text">Projet de data science : clustering, classification, forecasting et génération de courbes.</div>',
@@ -75,9 +72,9 @@ st.markdown(
 )
 st.divider()
 
-# =========================
+
 # Section: Introduction
-# =========================
+
 if section == "Introduction":
     st.header("1. Introduction")
 
@@ -107,9 +104,9 @@ if section == "Introduction":
     with col2:
         st.image(str(WEEKDAY_WEEKEND_IMG), caption="Weekday vs weekend curve", width=700)
 
-# =========================
+
 # Section: Clustering
-# =========================
+
 elif section == "Clustering":
     st.header("2. Clustering")
 
@@ -138,9 +135,9 @@ elif section == "Clustering":
         "et plus grande variabilité (probablement RP), l’autre à des clients plus sobres et plus stables (probablement RS)."
     )
 
-# =========================
+
 # Section: Classification
-# =========================
+
 elif section == "Classification":
     st.header("3. Classification")
 
@@ -176,9 +173,9 @@ elif section == "Classification":
     })
     st.dataframe(importance_data, use_container_width=True, height=420)
 
-# =========================
+
 # Section: Forecasting
-# =========================
+
 elif section == "Forecasting":
     st.header("4. Forecasting")
 
@@ -202,9 +199,9 @@ elif section == "Forecasting":
         "la météo, la saisonnalité détaillée ou d’autres variables externes."
     )
 
-# =========================
+
 # Section: Generation
-# =========================
+
 elif section == "Generation":
     st.header("5. Generation")
 
